@@ -32,6 +32,44 @@ app.get('/ab*cd', function(req, res) {
    res.send('Page Pattern Match');
 })
 
+app.get('/Bike', function (req, res) {
+	var bikeid = req.param('BikeID', null);
+
+	res.setHeader('Content-Type', 'application/json');
+
+	if (bikeid == null){
+		console.log("BikeID is null");
+		res.send(JSON.stringify({ 'status': false, 'message': 'null BikeID' }, null, 2));
+	}
+	else{
+		var pg = require('pg');
+		//or native libpq bindings
+		//var pg = require('pg').native
+
+		var conString = process.env.ELEPHANTSQL_URL || "postgres://rganvir:@localhost:5050/postgres";
+		var client = new pg.Client(conString);
+
+		client.connect(function(err) {
+				if(err) {
+					return console.error('could not connect to postgres', err);
+				}
+
+				client.query("SELECT * from bikes where id=$1", [bikeid],function(err, result) {
+					if(err) {
+						return console.error('error running query', err);
+					}
+				console.log(result.rows[0]['name']);
+				client.end();
+			});
+		});
+
+	}
+
+   console.log("Bike Request" + req.toString());
+   dummy();
+   res.send('Hello GET');
+})
+
 var server = app.listen(8081, function () {
 
    var host = server.address().address
@@ -49,16 +87,16 @@ var dummy = function(){
 
 	var client = new pg.Client(conString);
 	client.connect(function(err) {
-	  if(err) {
-	    return console.error('could not connect to postgres', err);
-	  }
-	  client.query("SELECT * from student where id=$1", ["1000"],function(err, result) {
-	    if(err) {
-	      return console.error('error running query', err);
-	    }
-	    console.log(result.rows[0]['name']);
-	    //output: Tue Jan 15 2013 19:12:47 GMT-600 (CST)
-	    client.end();
-	  });
+	if(err) {
+		return console.error('could not connect to postgres', err);
+	}
+	client.query("SELECT * from student where id=$1", ["1000"], function(err, result) {
+	if(err) {
+	  return console.error('error running query', err);
+	}
+	console.log(result.rows);
+	//output: Tue Jan 15 2013 19:12:47 GMT-600 (CST)
+	client.end();
+	});
 	});
 }
