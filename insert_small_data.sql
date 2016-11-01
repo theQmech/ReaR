@@ -7,10 +7,15 @@ delete from rentdata;
 
 -- Add sample data
 insert into bike values ('b1', 'btwin', 'white', 'company', 'usable', 'available_for_renting', null, null);
+insert into bike values ('b2', 'btwin', 'white', 'company', 'usable', 'available_for_renting', null, null);
+insert into bike values ('b3', 'btwin', 'white', 'company', 'usable', 'available_for_renting', null, null);
 
 insert into biker values ('u1', 'Shubham', 'pass', 'sgoel160@gmail.com', 'Hostel 3');
+insert into ownership values ('b1', 'u1');
 
 insert into bikestand values ('s1', 20, 'Hostel 4', (0.0,0.0));
 insert into bikestand values ('s2', 20, 'Hostel 5', (0.0,1.0));
 
 insert into bike_at_stand values ('b1', 's1');
+insert into bike_at_stand values ('b2', 's2');
+insert into bike_at_stand values ('b3', 's2');

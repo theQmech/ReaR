@@ -1,5 +1,5 @@
 drop table if exists showroom, ownership, rentdata, bike_at_stand, bike, biker, bikestand;
-drop type if exists status_, ownedby_, usage_, reason_, request_;
+drop type if exists status_, ownedby_, usage_, reason_, request_, latlong_;
 
 create type ownedby_ as enum('company', 'user');
 create type status_ as enum('with_owner', 'unusable', 'usable');
