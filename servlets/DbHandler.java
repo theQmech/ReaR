@@ -560,6 +560,136 @@ public class DbHandler {
 		return obj;
 	}
 
+	public static JSONObject AddBike(String userid, String name, String type, String model, String color){		
+		JSONObject obj = new JSONObject();
+		
+		System.out.println("AddBike:"+userid+","+name+","+model+","+color);
+		try{
+			if (userid == null){
+				obj.put("status",false);
+				obj.put("message", BAD_USER);
+			}
+			else if (name == null){
+				obj.put("status",false);
+				obj.put("message", "Null name");
+			}
+			else if(userid.length() + name.length() > 100) {
+				obj.put("status",false);
+				obj.put("message", "Name too long");
+			}
+			else if(model == null) {
+				obj.put("status",false);
+				obj.put("message", "Null model");
+			}
+			else if(model.length() > 20){
+				obj.put("status",false);
+				obj.put("message", "Model name too long");
+			}
+			else if(color == null) {
+				obj.put("status",false);
+				obj.put("message", "Null color");
+			}
+			else if(color.length() > 20){
+				obj.put("status",false);
+				obj.put("message", "Color name too long");
+			}
+			else {
+				Connection conn = DriverManager.getConnection(connString, userName, passWord);
+				String rel_ride = "insert into ride values(?,?,?,?,'user', 'with_owner', null, null)";
+				String rel_own = "insert into ownership values(?,?)";
+				
+				PreparedStatement stmt1 = conn.prepareStatement(rel_ride);
+				stmt1.setString(1, userid+":"+name);
+				stmt1.setString(2, type);
+				stmt1.setString(3, model);
+				stmt1.setString(4, color);
+				
+				PreparedStatement stmt2 = conn.prepareStatement(rel_own);
+				stmt2.setString(1, userid+":"+name);
+				stmt2.setString(2, userid);
+				
+				try {
+					conn.setAutoCommit(false);
+					if(stmt1.executeUpdate() == 0) {
+						obj.put("status", false);			
+						obj.put("message", "Bike already exists!");
+						conn.rollback();
+						conn.setAutoCommit(true);
+						conn.close();
+						return obj;
+					}
+					stmt2.executeUpdate();
+					conn.commit();
+				}
+				catch(SQLException se) {
+					conn.rollback();
+				}
+			
+			}			
+		}
+		catch(Exception e) {
+			System.out.println(e);
+			try{
+				obj.put("status",false);
+				obj.put("message",e);
+			}
+			catch(JSONException e1){
+				System.out.println(e1);
+			}
+		}
+		return obj;
+	}
+	
+	
+	public static JSONObject Lend(String userid, String rideid, String optype){
+		JSONObject obj = new JSONObject();
+		System.out.println("Lend: "+userid+","+rideid+","+optype);
+		
+		String query1 = "select count(*) from ownership where userid=? and rideid=?";
+		String upd1 = "insert into requests values (?,?,?,null)";
+		
+		String query2 = "select * from requests where ";
+		String upd2 = "delete from requests where ride"
+		String ret_cols = "ride.rideid as RideId, ride.ridetype as Type, ride.makemodel as Model, "
+				+ "	ride.color as Color, ride.url as URL,"
+				+ " CASE"
+				+ " WHEN ride.status='with_owner' THEN '0'"
+				+ "	WHEN exists (select * from requests where requests.rideid=ride.rideid and type='lend') THEN '1'"
+				+ "	WHEN exists (select * from requests where requests.rideid=ride.rideid and type='unlend') THEN '3'"
+				+ "	ELSE '2'"
+				+ "	END as Location";
+
+		if (userID == null){
+			obj.put("status", false);				
+			obj.put("message", BAD_USER);				
+		}
+		else{ 
+			try {
+				// Create the connection
+				Connection conn = DriverManager.getConnection(connString, userName, passWord);
+				String query = "select " + ret_cols + " from ride, ownership " + "where ride.rideid = ownership.rideid and ownership.ownerid=?";
+				PreparedStatement preparedStmt = conn.prepareStatement(query);
+				preparedStmt.setString(1, userID);
+				ResultSet result = preparedStmt.executeQuery();
+				JSONArray stnds = ResultSetConverter(result);
+				preparedStmt.close();
+				conn.close();
+
+				obj.put("status", true);
+				obj.put("data", stnds);
+			} catch (Exception e) {
+				System.out.println(e);
+				try {
+					obj.put("status", false);
+					obj.put("message", e);
+				} catch (JSONException e1) {
+					System.out.println(e1);
+				}
+			}
+		}
+		return obj;
+	}
+	
 	public static boolean bike_present_at_stand(String bikeID, String standID){	
 		System.out.println("authenticate:"+bikeID+","+standID);
 		try{
@@ -622,7 +752,7 @@ public class DbHandler {
 				PreparedStatement stmt = conn.prepareStatement(query);
 				stmt.setString(1, id);
 				stmt.setString(2, name);
-				stmt.setString(3, password);
+				stmt.setString(2, password);
 				if(stmt.executeUpdate() == 0) {
 					obj.put("status", false);			
 					obj.put("message", "Email already registered");

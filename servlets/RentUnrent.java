@@ -17,7 +17,7 @@ import org.json.JSONObject;
 /**
  * Servlet implementation class RentOp
  */
-@WebServlet("/RentOp")
+@WebServlet("/RentUnrent")
 public class RentUnrent extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
