@@ -19,8 +19,8 @@ create table ride(
 
 create table rider(
 	riderid			varchar(50) primary key not null,
-	name			varchar(40), not null
-	password		varchar(20), not null
+	name			varchar(40) not null,
+	password		varchar(20) not null,
 	address			varchar(60),
 	phone			varchar(20)
 );

@@ -1,18 +1,18 @@
 delete from ride;
 delete from rider;
 delete from stand;
-delete from showroom;
 delete from ownership;
 delete from rentdata;
 delete from requests;
+delete from ride_at_stand;
 
 -- Add sample data
-insert into ride values ('b1', '2 wheeler', 'btwin', 'White', 'company', 'lent','XXX','https://www.cse.iitb.ac.in/~shubham.g/images/dp.jpg');
-insert into ride values ('b2', '2 wheeler', 'myBike', 'Black', 'user', 'lent','XXX','https://www.cse.iitb.ac.in/~shubham.g/images/dp.jpg');
-insert into ride values ('b3', '2 wheeler', 'Hercules', 'Brown', 'user', 'lent','XXX','https://www.cse.iitb.ac.in/~shubham.g/images/dp.jpg');
-insert into ride values ('b4', '2 wheeler', 'Hero', 'Black', 'user', 'lent','XXX','https://www.cse.iitb.ac.in/~shubham.g/images/dp.jpg');
-insert into ride values ('b5', '2 wheeler', 'Firefox', 'Black', 'user', 'lent','XXX','https://www.cse.iitb.ac.in/~shubham.g/images/dp.jpg');
-insert into ride values ('b6', '2 wheeler', 'Kross', 'Black', 'user', 'lent','XXX','https://www.cse.iitb.ac.in/~shubham.g/images/dp.jpg');
+insert into ride values ('b1', '2 wheeler', 'btwin', 'White', 'company', 'lent',123,'https://www.cse.iitb.ac.in/~shubham.g/images/dp.jpg');
+insert into ride values ('b2', '2 wheeler', 'myBike', 'Black', 'user', 'lent',123,'https://www.cse.iitb.ac.in/~shubham.g/images/dp.jpg');
+insert into ride values ('b3', '2 wheeler', 'Hercules', 'Brown', 'user', 'lent',123,'https://www.cse.iitb.ac.in/~shubham.g/images/dp.jpg');
+insert into ride values ('b4', '2 wheeler', 'Hero', 'Black', 'user', 'lent',123,'https://www.cse.iitb.ac.in/~shubham.g/images/dp.jpg');
+insert into ride values ('b5', '2 wheeler', 'Firefox', 'Black', 'user', 'lent',123,'https://www.cse.iitb.ac.in/~shubham.g/images/dp.jpg');
+insert into ride values ('b6', '2 wheeler', 'Kross', 'Black', 'user', 'lent',123,'https://www.cse.iitb.ac.in/~shubham.g/images/dp.jpg');
 
 insert into rider values ('u1', 'Shubham', 'pass', 'Hostel 3');
 
