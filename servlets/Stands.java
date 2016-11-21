@@ -1,4 +1,3 @@
-package main;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -28,15 +27,17 @@ public class Stands extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String id = null;
 		HttpSession session = request.getSession(false);
 		if(session != null) {
-			System.out.println("Old Session for "+session.getAttribute("userid"));
+			id = (String) session.getAttribute(DbHandler.USER_ATTR);
+			System.out.println("Stands:: got "+DbHandler.USER_ATTR+": "+id);
+			System.out.println(request.toString());
 		}
 		else {
-			System.out.println("Too bad");
+			System.out.println("Stands: Session not set");
 		}
-		
-		String id = request.getParameter("UserID");
+
 		response.setContentType("application/json");
 	    response.setCharacterEncoding("UTF-8");		
 		PrintWriter out = response.getWriter();		

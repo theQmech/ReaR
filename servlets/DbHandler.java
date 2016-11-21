@@ -141,14 +141,58 @@ public class DbHandler {
 	public static JSONObject getStands(String userID){		
 		JSONObject obj = new JSONObject();
 		System.out.println("getStands");
-		String ret_cols = " stand.standid as StandID, address as Address, location as Location, count(rideid) as NumRides ";
-
+		
+		if(userID == null) {
+			try{
+				obj.put("status",false);
+				obj.put("message",BAD_USER);
+			}
+			catch(JSONException e1){
+				System.out.println(e1);
+			}
+			System.out.println(obj);
+			return obj;
+		}
+		
 		try{
 			// Create the connection
 			Connection conn = DriverManager.getConnection(connString, userName, passWord);
-			String query = "select "+ret_cols+" from stand left outer join ride_at_stand "
-					+ "on stand.standid = ride_at_stand.standid "
-					+ "group by (stand.standid)";
+			String query = "with "
+					+ "fullRide as "
+					+ "	(select * from ride_at_stand natural join ride), "
+					+ "bike as "
+					+ "	(select stand.standid, count(rideid) as numbikes "
+					+ "	from stand left outer join fullRide "
+					+ "	on stand.standid = fullRide.standid "
+					+ "	where ridetype = '2 wheeler' "
+					+ "	group by stand.standid), "
+					+ "otherbike as "
+					+ "	(select standid,0  as numbikes "
+					+ "	from stand "
+					+ "	where standid not in "
+					+ "		(select standid from bike)), "
+					+ "allbikes as "
+					+ "	(select * from bike "
+					+ "	union "
+					+ "	select * from otherbike), "
+					+ "car as "
+					+ "	(select stand.standid, count(rideid) as numcars "
+					+ "	from stand left outer join fullRide "
+					+ "	on stand.standid = fullRide.standid "
+					+ "	where ridetype = '4 wheeler' "
+					+ "	group by stand.standid), "
+					+ "othercar as "
+					+ "	(select standid,0  as numcars "
+					+ "	from stand "
+					+ "	where standid not in "
+					+ "		(select standid from car)), "
+					+ "allcars as "
+					+ "	(select * from car "
+					+ "	union "
+					+ "	select * from othercar) "
+					+ "select stand.standid, name, address, lat, long, numbikes, numcars "
+					+ "from allbikes natural join allcars natural join stand ";
+			
 			PreparedStatement preparedStmt = conn.prepareStatement(query);
 			ResultSet result =  preparedStmt.executeQuery();
 			
@@ -169,6 +213,7 @@ public class DbHandler {
 				System.out.println(e1);
 			}
 		}
+		System.out.println(obj);
 		return obj;
 	}
 	
