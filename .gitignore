@@ -43,3 +43,4 @@ captures/
 database/
 logfile
 
+node_modules/

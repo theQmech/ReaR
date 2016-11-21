@@ -14,7 +14,7 @@ public class DbHandler {
 	private static String connString = "jdbc:postgresql://localhost:5432/postgres";
 	private static String userName = "rganvir";
 	private static String passWord = "";
-	
+
 	// Frequently used strings
 	private static String BAD_USER = "bad user";
 	public static String USER_ATTR = "userid";
@@ -534,6 +534,77 @@ public class DbHandler {
 			System.out.println(e);
 		}
 		return false;
+	}
+
+	public static JSONObject register(HttpServletRequest request, String id, String name, String password){		
+		JSONObject obj = new JSONObject();
+		System.out.println("register:"+id+","+name+","+password);
+		try{
+			if(id == null) {
+				obj.put("status",false);
+				obj.put("message", "Null email");
+			}
+			else if(name == null) {
+				obj.put("status",false);
+				obj.put("message", "Null name");
+			}
+			else if(password == null) {
+				obj.put("status",false);
+				obj.put("message", "Null password");
+			}
+			else if(id.length()>50) {
+				obj.put("status",false);
+				obj.put("message", "Email too long");
+			}
+			else if(name.length()>40) {
+				obj.put("status",false);
+				obj.put("message", "Name too long");
+			}
+			else if(password.length()>20) {
+				obj.put("status",false);
+				obj.put("message", "Password too long");
+			}
+			else {
+				Connection conn = DriverManager.getConnection(connString, userName, passWord);
+				String query = "insert into rider values(?,?,?,null,null)";
+		
+				PreparedStatement stmt = conn.prepareStatement(query);
+				stmt.setString(1, id);
+				stmt.setString(2, name);
+				stmt.setString(2, password);
+				if(stmt.executeUpdate() == 0) {
+					obj.put("status", false);			
+					obj.put("message", "Email already registered");
+					conn.close();
+					return obj;
+				}
+				else {
+					obj.put("status", true);			
+					obj.put("message", "");
+					obj.put("data", name);
+					
+					HttpSession session = request.getSession(true);
+					session.setAttribute(DbHandler.USER_ATTR, id);
+//					if(session.isNew()){
+//						System.out.println("New Session for "+id);
+//					}
+//					else{
+//						System.out.println("Using old Session for "+id);
+//					}
+				}
+			}			
+		}
+		catch(Exception e) {
+			System.out.println(e);
+			try{
+				obj.put("status",false);
+				obj.put("message",e);
+			}
+			catch(JSONException e1){
+				System.out.println(e1);
+			}
+		}
+		return obj;
 	}
 
 }
