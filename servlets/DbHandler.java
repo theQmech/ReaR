@@ -622,7 +622,7 @@ public class DbHandler {
 				PreparedStatement stmt = conn.prepareStatement(query);
 				stmt.setString(1, id);
 				stmt.setString(2, name);
-				stmt.setString(2, password);
+				stmt.setString(3, password);
 				if(stmt.executeUpdate() == 0) {
 					obj.put("status", false);			
 					obj.put("message", "Email already registered");
