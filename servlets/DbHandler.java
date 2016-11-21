@@ -14,9 +14,10 @@ public class DbHandler {
 	private static String connString = "jdbc:postgresql://localhost:5432/postgres";
 	private static String userName = "rganvir";
 	private static String passWord = "";
-	private static String ADMIN_ID = "000";
-	private static String ADMIN_PWD = "pwd";
-	public static String USER_ATTR = "UserID";
+	
+	// Frequently used strings
+	private static String BAD_USER = "bad user";
+	public static String USER_ATTR = "userid";
 	
 	private static JSONArray ResultSetConverter(ResultSet rs) throws SQLException, JSONException {
 		
