@@ -641,54 +641,182 @@ public class DbHandler {
 	}
 	
 	
-	public static JSONObject Lend(String userid, String rideid, String optype){
+	public static JSONObject Lend(String userid, String rideid, String optype) throws JSONException, SQLException{
 		JSONObject obj = new JSONObject();
 		System.out.println("Lend: "+userid+","+rideid+","+optype);
 		
-		String query1 = "select count(*) from ownership where userid=? and rideid=?";
-		String upd1 = "insert into requests values (?,?,?,null)";
-		
-		String query2 = "select * from requests where ";
-		String upd2 = "delete from requests where ride"
-		String ret_cols = "ride.rideid as RideId, ride.ridetype as Type, ride.makemodel as Model, "
-				+ "	ride.color as Color, ride.url as URL,"
-				+ " CASE"
-				+ " WHEN ride.status='with_owner' THEN '0'"
-				+ "	WHEN exists (select * from requests where requests.rideid=ride.rideid and type='lend') THEN '1'"
-				+ "	WHEN exists (select * from requests where requests.rideid=ride.rideid and type='unlend') THEN '3'"
-				+ "	ELSE '2'"
-				+ "	END as Location";
-
-		if (userID == null){
+		if (userid == null){
 			obj.put("status", false);				
 			obj.put("message", BAD_USER);				
+			return obj;
 		}
-		else{ 
-			try {
-				// Create the connection
-				Connection conn = DriverManager.getConnection(connString, userName, passWord);
-				String query = "select " + ret_cols + " from ride, ownership " + "where ride.rideid = ownership.rideid and ownership.ownerid=?";
-				PreparedStatement preparedStmt = conn.prepareStatement(query);
-				preparedStmt.setString(1, userID);
-				ResultSet result = preparedStmt.executeQuery();
-				JSONArray stnds = ResultSetConverter(result);
-				preparedStmt.close();
+		
+		if (optype.equals("Place")){
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			String query = "select count(*) from ownership natural join ride where ownership.userid=? and ride.rideid=? and ride.status='with_owner'";
+			String upd = "insert into requests values (?,?,?,null)";
+			
+			PreparedStatement stmt1 = conn.prepareStatement(query);
+			stmt1.setString(1, userid);
+			stmt1.setString(2, rideid);
+			
+			PreparedStatement stmt2 = conn.prepareStatement(upd);
+			stmt2.setString(1, rideid);
+			stmt2.setString(2, userid);
+			stmt2.setString(3, "lend");
+			
+			conn.setAutoCommit(false);
+			ResultSet result = stmt1.executeQuery();
+			if(!result.isBeforeFirst() ) {
+				obj.put("status", false);			
+				obj.put("message", "Illegal request!");
+				conn.rollback();
+				conn.setAutoCommit(true);
 				conn.close();
-
-				obj.put("status", true);
-				obj.put("data", stnds);
-			} catch (Exception e) {
-				System.out.println(e);
-				try {
-					obj.put("status", false);
-					obj.put("message", e);
-				} catch (JSONException e1) {
-					System.out.println(e1);
-				}
+				return obj;
 			}
+			if (stmt2.executeUpdate() < 1){
+				obj.put("status", false);			
+				obj.put("message", "Error placing request. Please try again later");
+				conn.rollback();
+				conn.setAutoCommit(true);
+				conn.close();
+				return obj;
+			}
+			conn.commit();
+			
+			obj.put("status", true);			
+			obj.put("message", "");
+			obj.put("data", 1);
+		}
+		else if (optype.equals("Cancel")){
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			String query = "select * from requests where rideid=? and type='lend'";
+			String upd = "delete from requests where rideid=?";
+			
+			PreparedStatement stmt1 = conn.prepareStatement(query);
+			stmt1.setString(1, userid);
+			stmt1.setString(2, rideid);
+			
+			PreparedStatement stmt2 = conn.prepareStatement(upd);
+			stmt2.setString(1, rideid);
+			stmt2.setString(2, userid);
+			stmt2.setString(3, "lend");
+			
+			conn.setAutoCommit(false);
+			ResultSet result = stmt1.executeQuery();
+			if(!result.isBeforeFirst() ) {
+				obj.put("status", false);			
+				obj.put("message", "Illegal request!");
+				conn.rollback();
+				conn.setAutoCommit(true);
+				conn.close();
+				return obj;
+			}
+			if (stmt2.executeUpdate() < 1){
+				obj.put("status", false);			
+				obj.put("message", "Error placing request. Please try again later");
+				conn.rollback();
+				conn.setAutoCommit(true);
+				conn.close();
+				return obj;
+			}
+			conn.commit();
+			obj.put("status", true);			
+			obj.put("message", "");
+			obj.put("data", 0);
 		}
 		return obj;
 	}
+
+
+	public static JSONObject Unlend(String userid, String rideid, String optype) throws JSONException, SQLException{
+		JSONObject obj = new JSONObject();
+		System.out.println("Lend: "+userid+","+rideid+","+optype);
+		
+		if (userid == null){
+			obj.put("status", false);				
+			obj.put("message", BAD_USER);				
+			return obj;
+		}
+		
+		if (optype.equals("Place")){
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			String query = "select count(*) from ownership natural join ride where ownership.userid=? and ride.rideid=? and ride.status='lent'";
+			String upd = "insert into requests values (?,?,?,null)";
+			
+			PreparedStatement stmt1 = conn.prepareStatement(query);
+			stmt1.setString(1, userid);
+			stmt1.setString(2, rideid);
+			
+			PreparedStatement stmt2 = conn.prepareStatement(upd);
+			stmt2.setString(1, rideid);
+			stmt2.setString(2, userid);
+			stmt2.setString(3, "unlend");
+			
+			conn.setAutoCommit(false);
+			ResultSet result = stmt1.executeQuery();
+			if(!result.isBeforeFirst() ) {
+				obj.put("status", false);			
+				obj.put("message", "Illegal request!");
+				conn.rollback();
+				conn.setAutoCommit(true);
+				conn.close();
+				return obj;
+			}
+			if (stmt2.executeUpdate() < 1){
+				obj.put("status", false);			
+				obj.put("message", "Error placing request. Please try again later");
+				conn.rollback();
+				conn.setAutoCommit(true);
+				conn.close();
+				return obj;
+			}
+			conn.commit();
+			obj.put("status", true);			
+			obj.put("message", "");
+			obj.put("data", 3);
+		}
+		else if (optype.equals("Cancel")){
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			String query = "select * from requests where rideid=? and type='unlend'";
+			String upd = "delete from requests where rideid=?";
+			
+			PreparedStatement stmt1 = conn.prepareStatement(query);
+			stmt1.setString(1, userid);
+			stmt1.setString(2, rideid);
+			
+			PreparedStatement stmt2 = conn.prepareStatement(upd);
+			stmt2.setString(1, rideid);
+			stmt2.setString(2, userid);
+			stmt2.setString(3, "lend");
+			
+			conn.setAutoCommit(false);
+			ResultSet result = stmt1.executeQuery();
+			if(!result.isBeforeFirst() ) {
+				obj.put("status", false);			
+				obj.put("message", "Illegal request!");
+				conn.rollback();
+				conn.setAutoCommit(true);
+				conn.close();
+				return obj;
+			}
+			if (stmt2.executeUpdate() < 1){
+				obj.put("status", false);			
+				obj.put("message", "Error placing request. Please try again later");
+				conn.rollback();
+				conn.setAutoCommit(true);
+				conn.close();
+				return obj;
+			}
+			conn.commit();
+			obj.put("status", true);			
+			obj.put("message", "");
+			obj.put("data", 0);
+		}
+		return obj;
+	}
+
 	
 	public static boolean bike_present_at_stand(String bikeID, String standID){	
 		System.out.println("authenticate:"+bikeID+","+standID);

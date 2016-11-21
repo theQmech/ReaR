@@ -49,8 +49,14 @@ public class LendUnlend extends HttpServlet {
 				&& (op.equals("Lend") || op.equals("Unlend")) && (optype.equals("Cancel") || optype.equals("Place")));
 		
 		if (!valid){
-			obj.put("status", false);
-			obj.put("message", "Incomplete request!");
+			try {
+				obj.put("status", false);
+				obj.put("message", "Incomplete request!");
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		}
 		else{
 			if (op.equals("Lend")){

@@ -65,7 +65,7 @@ create table requests(
 	rideid			varchar(20)	not null,
 	riderid			varchar(20) not null,
 	type			request_,
-	standid			varchar(20),
+	standid			varchar(20), -- is unnecessary
 	primary key (rideid, riderid),
 	foreign key (rideid) references ride on DELETE cascade,
 	foreign key (riderid) references rider on DELETE cascade
