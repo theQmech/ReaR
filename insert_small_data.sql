@@ -16,22 +16,22 @@ insert into ride values ('b6', 'bike', 'Kross', 'Black', 'user', 'lent');
 
 insert into rider values ('u1', 'Shubham', 'pass', 'sgoel160@gmail.com', 'Hostel 3');
 
-insert into stand values ('s1', 20, 'Hostel 4', (0.0,0.0));
-insert into stand values ('s2', 20, 'Hostel 5', (0.0,1.0));
-insert into stand values ('s3', 20, 'Hostel 6', (0.0,1.0));
-insert into stand values ('s4', 20, 'Hostel 7', (0.0,1.0));
-insert into stand values ('s5', 20, 'Hostel 8', (0.0,1.0));
-insert into stand values ('s6', 20, 'Hostel 9', (0.0,1.0));
-insert into stand values ('s7', 20, 'Hostel 10', (0.0,1.0));
-insert into stand values ('s8', 20, 'Hostel 11', (0.0,1.0));
-insert into stand values ('s9', 20, 'Hostel 12', (0.0,1.0));
-insert into stand values ('s10', 20, 'Hostel 13', (0.0,1.0));
-insert into stand values ('s101', 20, 'Bandra', (0.0,1.0));
-insert into stand values ('s102', 20, 'Dadar', (0.0,1.0));
-insert into stand values ('s103', 20, 'Andheri', (0.0,1.0));
-insert into stand values ('s104', 20, 'CST', (0.0,1.0));
-insert into stand values ('s105', 20, 'Powai', (0.0,1.0));
-insert into stand values ('s106', 20, 'Borivali', (0.0,1.0));
+insert into stand values ('s1', 20, 'Hostel 4', 0.0));
+insert into stand values ('s2', 20, 'Hostel 5', 0.0));
+insert into stand values ('s3', 20, 'Hostel 6', 0.0));
+insert into stand values ('s4', 20, 'Hostel 7', 0.0));
+insert into stand values ('s5', 20, 'Hostel 8', 0.0));
+insert into stand values ('s6', 20, 'Hostel 9', 0.0));
+insert into stand values ('s7', 20, 'Hostel 10', 0.0));
+insert into stand values ('s8', 20, 'Hostel 11', 0.0));
+insert into stand values ('s9', 20, 'Hostel 12', 0.0));
+insert into stand values ('s10', 20, 'Hostel 13', 0.0));
+insert into stand values ('s101', 20, 'Bandra', 0.0));
+insert into stand values ('s102', 20, 'Dadar', 0.0));
+insert into stand values ('s103', 20, 'Andheri', 0.0));
+insert into stand values ('s104', 20, 'CST', 0.0));
+insert into stand values ('s105', 20, 'Powai', 0.0));
+insert into stand values ('s106', 20, 'Borivali', 0.0));
 
 insert into ride_at_stand values ('b1', 's1');
 insert into ride_at_stand values ('b2', 's10');

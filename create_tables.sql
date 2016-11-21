@@ -5,7 +5,6 @@ create type ride_ as enum('bike', 'car', 'mobike');
 create type ownedby_ as enum('company', 'user');
 create type status_ as enum('with_owner', 'lent');
 create type request_ as enum('nullable', 'repair', 'unlend', 'lend');
-create type latlong_ as (lat float, long float);
 
 create table ride(
 	rideid			varchar(20) primary key not null,
@@ -28,15 +27,8 @@ create table stand(
 	standid			varchar(20) primary key not null,
 	capacity		int			not null,
 	address			varchar(60)	not null,
-	location		latlong_	not null
-);
-
-create table showroom(
-	showroomid		varchar(20)	primary key not null,
-	address			varchar(60)	not null,
-	location		latlong_	not null,
-	openingtime		time		not null,
-	closingtime		time		not null
+	lat				float		not null,
+	long			float		not null
 );
 
 create table ownership(
