@@ -12,7 +12,8 @@ create table ride(
 	makemodel		varchar(20),
 	color			varchar(20),
 	ownedby			ownedby_ not null,
-	status			status_ not null
+	status			status_ not null,
+	code			int
 );
 
 create table rider(
@@ -26,6 +27,7 @@ create table rider(
 create table stand(
 	standid			varchar(20) primary key not null,
 	capacity		int			not null,
+	name			varchar(20)	not null,
 	address			varchar(60)	not null,
 	lat				float		not null,
 	long			float		not null
