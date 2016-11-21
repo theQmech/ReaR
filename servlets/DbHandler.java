@@ -894,12 +894,6 @@ public class DbHandler {
 					
 					HttpSession session = request.getSession(true);
 					session.setAttribute(DbHandler.USER_ATTR, id);
-//					if(session.isNew()){
-//						System.out.println("New Session for "+id);
-//					}
-//					else{
-//						System.out.println("Using old Session for "+id);
-//					}
 				}
 			}			
 		}
@@ -916,4 +910,111 @@ public class DbHandler {
 		return obj;
 	}
 
+	public static JSONObject setProfile(String id, String name, String address, String phone){		
+		JSONObject obj = new JSONObject();
+		try{
+			if(id == null) {
+				obj.put("status",false);
+				obj.put("message", BAD_USER);
+			}
+			else if(name == null) {
+				obj.put("status",false);
+				obj.put("message", "Null name");
+			}
+			else if(name.length()>40) {
+				obj.put("status",false);
+				obj.put("message", "Name too long");
+			}
+			else if(address.length()>60) {
+				obj.put("status",false);
+				obj.put("message", "Address too long");
+			}
+			else if(phone.length()>20) {
+				obj.put("status",false);
+				obj.put("message", "Phone Number too long");
+			}
+			else {
+				Connection conn = DriverManager.getConnection(connString, userName, passWord);
+				String query = "update rider set name=?,address=?,phone=? where riderid=?";
+		
+				PreparedStatement stmt = conn.prepareStatement(query);
+				stmt.setString(1, name);
+				stmt.setString(2, address);
+				stmt.setString(3, phone);
+				stmt.setString(4, id);
+				if(stmt.executeUpdate() == 0) {
+					obj.put("status", false);			
+					obj.put("message", "Error while updating");
+					conn.close();
+					return obj;
+				}
+				else {
+					obj.put("status", true);			
+					obj.put("message", "");
+				}
+			}			
+		}
+		catch(Exception e) {
+			System.out.println(e);
+			try{
+				obj.put("status",false);
+				obj.put("message",e);
+			}
+			catch(JSONException e1){
+				System.out.println(e1);
+			}
+		}
+		return obj;
+	}
+	
+	public static JSONObject getProfile(String id){		
+		JSONObject obj = new JSONObject();
+		System.out.println("getProfile: "+id);
+		
+		if(id == null) {
+			try{
+				obj.put("status",false);
+				obj.put("message",BAD_USER);
+			}
+			catch(JSONException e1){
+				System.out.println(e1);
+			}
+			System.out.println(obj);
+			return obj;
+		}
+		
+		String ret_cols = "name,address,phone";
+		try{
+			// Create the connection
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			String query =  "select "+ret_cols+" from rider where riderid=?";
+			PreparedStatement preparedStmt = conn.prepareStatement(query);
+			preparedStmt.setString(1, id);
+			ResultSet result =  preparedStmt.executeQuery();
+			
+			JSONArray stnds = ResultSetConverter(result);
+			preparedStmt.close();
+			conn.close();
+			
+			if(stnds.length()<1) {
+				obj.put("status",false);
+				obj.put("message","Rider not found");
+			}
+			else {
+				obj.put("status",true);				
+				obj.put("data", stnds.get(0));
+			}	
+		}
+		catch(Exception e) {
+			System.out.println(e);
+			try{
+				obj.put("status",false);
+				obj.put("message",e);
+			}
+			catch(JSONException e1){
+				System.out.println(e1);
+			}
+		}
+		return obj;
+	}
 }
