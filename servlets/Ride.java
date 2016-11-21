@@ -8,18 +8,19 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
- * Servlet implementation class BikeList
+ * Servlet implementation class Bike
  */
-@WebServlet("/BikeList")
-public class BikeList extends HttpServlet {
+@WebServlet("/Bike")
+public class Ride extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public BikeList() {
+    public Ride() {
         super();
     }
 
@@ -27,13 +28,16 @@ public class BikeList extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String userID = request.getParameter("UserID");
-		String standID = request.getParameter("StandID");
-		String showroomID = request.getParameter("ShowroomID");
+		HttpSession session = request.getSession(false);
+		String userID = null;
+		if (session != null){
+			userID = (String) session.getAttribute(DbHandler.USER_ATTR);
+		}
+		String rideID = request.getParameter("RideID");
 		response.setContentType("application/json");
 	    response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();		
-		out.print(DbHandler.getBikeList(userID,standID,showroomID));
+		out.print(DbHandler.getRide(userID, rideID));
 		out.close();
 	}
 

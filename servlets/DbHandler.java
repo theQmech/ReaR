@@ -16,6 +16,7 @@ public class DbHandler {
 	private static String passWord = "";
 	private static String ADMIN_ID = "000";
 	private static String ADMIN_PWD = "pwd";
+	public static String USER_ATTR = "UserID";
 	
 	private static JSONArray ResultSetConverter(ResultSet rs) throws SQLException, JSONException {
 		
@@ -91,39 +92,36 @@ public class DbHandler {
 				obj.put("message", "Null password");
 			}
 			else {
-				if(id.equals(ADMIN_ID) && password.equals(ADMIN_PWD)) {
-					obj.put("status",true);			
-					obj.put("message", "admin");		
-					obj.put("data", id);
-				}
+				
 				// Create the connection
 				Connection conn = DriverManager.getConnection(connString, userName, passWord);
-				String query = "select count(*) from rider where riderid=? and password=?;";
+				String query = "select name from rider where riderid=? and password=?;";
 				PreparedStatement preparedStmt = conn.prepareStatement(query);
 				preparedStmt.setString(1, id);
 				preparedStmt.setString(2, password);
 				ResultSet result =  preparedStmt.executeQuery();
-				result.next();
-				boolean ans = (result.getInt(1) > 0); 
 				preparedStmt.close();
 				conn.close();
-				if(ans==true){
-					obj.put("status",true);			
-					obj.put("message", "user");		
+				
+				if (!result.isBeforeFirst() ) {    
+				    System.out.println("No user found"); 
+					obj.put("status", false);
+					obj.put("message", "Authentication Failed");
+				}
+				else{
+					result.next();
+				
+					obj.put("status",true);
 					obj.put("data", id);
 					
 					HttpSession session = request.getSession(true);
-					session.setAttribute("userid", id);
+					session.setAttribute(USER_ATTR, id);
 					if(session.isNew()){
 						System.out.println("New Session for "+id);
 					}
 					else{
 						System.out.println("Using old Session for "+id);
 					}
-				}
-				else{						
-						obj.put("status",false);
-						obj.put("message", "Authentication Failed");					
 				}
 			}			
 		} 
@@ -174,20 +172,29 @@ public class DbHandler {
 		return obj;
 	}
 	
-	public static JSONObject getBikeList(String userID, String standID, String showroomID){		
+	public static JSONObject getRidesAtStand(String userID, String standID){		
 		JSONObject obj = new JSONObject();
-		System.out.println("getBikeList: "+userID+", "+standID+", "+showroomID);
-		String ret_cols = " bikeid as BikeID,makemodel as Model,color as Color,status as Status ";
+		System.out.println("getRidesAtStand: "+userID+", "+standID);
+		String ret_cols = "ride.rideid as RideID, ridetype as Type, makemodel as Model, color as Color, url as URL, stand.name as Location";
 
 		try{
-			if(showroomID != null) {
-				obj.put("status",false);
-				obj.put("message", "Not Implemented showrooms yet.");
+			if (userID == null){
+				obj.put("status", false);				
+				obj.put("message", "Session not found");				
 			}
-			else if(standID != null) {
+			else if(standID == null){
+				obj.put("status", false);				
+				obj.put("message", "Incomplete request");				
+			}
+			else {
 				// Create the connection
 				Connection conn = DriverManager.getConnection(connString, userName, passWord);
-				String query =  "select "+ret_cols+" from bike natural join bike_at_stand where bikestandid=?";
+				String query =  "select "+ret_cols+
+						" from ride, ride_at_stand, stand" +
+						" where ride.rideid=ride_at_stand.rideid and "
+						+ "		ride_at_stand.standid=? and "
+						+ "		ride_at_stand.standid=stand.standid and"
+						+ "		not exists (select * from requests where requests.rideid=ride.rideid)";
 				PreparedStatement preparedStmt = conn.prepareStatement(query);
 				preparedStmt.setString(1, standID);
 				ResultSet result =  preparedStmt.executeQuery();
@@ -197,25 +204,7 @@ public class DbHandler {
 
 				obj.put("status",true);				
 				obj.put("data", stnds);	
-			}
-			else if(userID != null) {
-				// Create the connection
-				Connection conn = DriverManager.getConnection(connString, userName, passWord);
-				String query =  "select "+ret_cols+" from bike natural join ownership where ownerid=?";
-				PreparedStatement preparedStmt = conn.prepareStatement(query);
-				preparedStmt.setString(1, userID);
-				ResultSet result =  preparedStmt.executeQuery();
-				JSONArray stnds = ResultSetConverter(result);
-				preparedStmt.close();
-				conn.close();
-
-				obj.put("status",true);				
-				obj.put("data", stnds);
-			} 
-			else {
-				obj.put("status",false);
-				obj.put("message","Null Arguments");
-			}		
+			}	
 		}
 		catch(Exception e) {
 			System.out.println(e);
@@ -230,18 +219,31 @@ public class DbHandler {
 		return obj;
 	}
 	
-	public static JSONObject getBike(String bikeID){		
+	public static JSONObject getRide(String userID, String rideID){		
 		JSONObject obj = new JSONObject();
-		System.out.println("getBike: "+bikeID);
-		String ret_cols = " bikeid as BikeID,makemodel as Model,color as Color,status as Status ";
+		System.out.println("getBike: "+rideID);
+		String ret_cols = "ride.rideid as RideID, ride.ridetype as Type, ride.makemodel as Model, "
+				+ "	ride.color as Color, 'lent' as Status, ride.url as URL, null as Code, stand.name as Location";
 
 		try{
-			if(bikeID != null) {
+			if (userID == null){
+				obj.put("status", false);				
+				obj.put("message", "Session not found");				
+			}
+			else if(rideID == null){
+				obj.put("status", false);				
+				obj.put("message", "Incomplete request");				
+			}
+			else {
 				// Create the connection
 				Connection conn = DriverManager.getConnection(connString, userName, passWord);
-				String query =  "select "+ret_cols+" from bike where bikeid=?";
+				String query =  "select "+ret_cols+" from ride, ride_at_stand, stand "
+								+ "where ride.rideid=? and "
+								+ "		ride.rideid=ride_at_stand.rideid and "
+								+ "		ride_at_stand.standid=stand.standid "
+								+ "		and not exists (select * from requests where requests.rideid=ride.rideid)";
 				PreparedStatement preparedStmt = conn.prepareStatement(query);
-				preparedStmt.setString(1, bikeID);
+				preparedStmt.setString(1, rideID);
 				ResultSet result =  preparedStmt.executeQuery();
 				JSONArray stnds = ResultSetConverter(result);
 				preparedStmt.close();
@@ -255,11 +257,7 @@ public class DbHandler {
 					obj.put("status",true);				
 					obj.put("data", stnds.get(0));
 				}
-			} 
-			else {
-				obj.put("status",false);
-				obj.put("message","Null Arguments");
-			}		
+			}
 		}
 		catch(Exception e) {
 			System.out.println(e);
@@ -274,21 +272,22 @@ public class DbHandler {
 		return obj;
 	}
 	
-public static JSONObject Rent(String userid, String bikeid, String standid) throws JSONException, SQLException{
+	public static JSONObject Rent(String userid, String rideid, String standid) throws JSONException, SQLException{
 
-		System.out.println("Rent: "+userid+", "+bikeid+", "+standid);
+		System.out.println("Rent: "+userid+", "+rideid+", "+standid);
 	
 		// Create the connection
 		Connection conn = DriverManager.getConnection(connString, userName, passWord);
-		String remove_bike_from_stand = "delete from bike_at_stand where bikeid=? and bikestandid=?";
+		String remove_bike_from_stand = "delete from ride_at_stand where rideid=? and standid=?";
 		String save_rent_data = "insert into rentdata values(?, ?, ?, null)";
+		String get_ride_code = "select code from ride where rideid=?";
 		
 		PreparedStatement stmt1 = conn.prepareStatement(remove_bike_from_stand);
-		stmt1.setString(1, bikeid);
+		stmt1.setString(1, rideid);
 		stmt1.setString(2, standid);
 		
 		PreparedStatement stmt2 = conn.prepareStatement(save_rent_data);
-		stmt2.setString(1, bikeid);
+		stmt2.setString(1, rideid);
 		stmt2.setString(2, userid);
 		stmt2.setString(3, standid);
 		
@@ -316,7 +315,7 @@ public static JSONObject Rent(String userid, String bikeid, String standid) thro
 			conn.setAutoCommit(true);
 			conn.close();
 
-			obj = getRentedBikeList(userid);
+			obj = getRideCode(userid);
 		}
 		catch(SQLException se){
 			conn.close();
@@ -326,13 +325,12 @@ public static JSONObject Rent(String userid, String bikeid, String standid) thro
 			System.out.println(obj.toString());
 		}
 		
-		
 		return obj;	
 	}
 	
-	public static JSONObject Unrent(String userid, String bikeid, String standid) throws JSONException, SQLException{
+	public static JSONObject Unrent(String userid, String rideid, String standid) throws JSONException, SQLException{
 
-		System.out.println("Unrent: "+userid+", "+bikeid+", "+standid);
+		System.out.println("Unrent: "+userid+", "+rideid+", "+standid);
 		
 		// Create the connection
 		Connection conn = DriverManager.getConnection(connString, userName, passWord);
@@ -340,11 +338,11 @@ public static JSONObject Rent(String userid, String bikeid, String standid) thro
 		String delete_rent_data = "delete from rentdata where bikeid=?";
 		
 		PreparedStatement stmt1 = conn.prepareStatement(put_bike_in_stand);
-		stmt1.setString(1, bikeid);
+		stmt1.setString(1, rideid);
 		stmt1.setString(2, standid);
 		
 		PreparedStatement stmt2 = conn.prepareStatement(delete_rent_data);
-		stmt2.setString(1, bikeid);
+		stmt2.setString(1, rideid);
 		
 		JSONObject obj = new JSONObject();
 		
@@ -370,7 +368,7 @@ public static JSONObject Rent(String userid, String bikeid, String standid) thro
 			conn.setAutoCommit(true);
 			conn.close();
 			
-			obj = getRentedBikeList(userid);
+			obj.put("status", true);
 		}
 		catch(SQLException se){
 			conn.close();
@@ -380,8 +378,51 @@ public static JSONObject Rent(String userid, String bikeid, String standid) thro
 			System.out.println(obj.toString());
 		}
 		
-		
 		return obj;	
+	}
+	
+	public static JSONObject getRideCode(String RideID){
+		JSONObject obj = new JSONObject();
+		System.out.println("getRideCode: "+RideID);
+		
+		try{
+			if(RideID != null) {
+				// Create the connection
+				Connection conn = DriverManager.getConnection(connString, userName, passWord);
+				String query = "select code as Code from ride where rideid=?";
+				PreparedStatement preparedStmt = conn.prepareStatement(query);
+				preparedStmt.setString(1, RideID);
+				ResultSet result =  preparedStmt.executeQuery();
+				if (!result.isBeforeFirst() ) {    
+				    System.out.println("Ride Code not Found"); 
+					obj.put("status", false);
+					obj.put("message", "Ride Code not Found");
+				}
+				else{
+					result.next();
+					obj.put("status", false);
+					obj.put("data", Integer.toString(result.getInt(1)));
+				}
+				preparedStmt.close();
+				conn.close();
+			} 
+			else {
+				obj.put("status",false);
+				obj.put("message","Null Arguments");
+			}		
+		}
+		catch(Exception e) {
+			System.out.println(e);
+			try{
+				obj.put("status",false);
+				obj.put("message",e);
+			}
+			catch(JSONException e1){
+				System.out.println(e1);
+			}
+		}
+		
+		return obj;
 	}
 	
 	public static JSONObject getRentedBikeList(String userID){		

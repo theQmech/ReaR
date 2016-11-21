@@ -9,6 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,13 +18,13 @@ import org.json.JSONObject;
  * Servlet implementation class RentOp
  */
 @WebServlet("/RentOp")
-public class RentOp extends HttpServlet {
+public class RentUnrent extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public RentOp() {
+    public RentUnrent() {
         super();
     }
 
@@ -31,25 +32,29 @@ public class RentOp extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String userid = request.getParameter("UserID");
-		String bikeid = request.getParameter("BikeID");
+		HttpSession session = request.getSession(false);
+		String userID = null;
+		if (session != null){
+			userID = (String) session.getAttribute(DbHandler.USER_ATTR);
+		}
+		String rideid = request.getParameter("RideID");
 		String standid = request.getParameter("StandID");
 		String op = request.getParameter("Op");
 		
-		System.out.println("RentOp: "+userid+", "+bikeid+", "+standid+", "+op);
+		System.out.println("RentOp: "+userID+", "+rideid+", "+standid+", "+op);
 		
 		JSONObject obj = new JSONObject();
-		if (userid != null && bikeid!=null && standid!=null && (op.equals("rent")|| op.equals("unrent"))){
+		if (userID != null && rideid!=null && standid!=null && (op.equals("rent")|| op.equals("unrent"))){
 			if (op.equals("rent")){
 				try {
-					obj = DbHandler.Rent(userid, bikeid, standid);
+					obj = DbHandler.Rent(userID, rideid, standid);
 				} catch (JSONException | SQLException e) {
 					e.printStackTrace();
 				}
 			}
 			else if (op.equals("unrent")){
 				try {
-					obj = DbHandler.Unrent(userid, bikeid, standid);
+					obj = DbHandler.Unrent(userID, rideid, standid);
 				} catch (JSONException | SQLException e) {
 					e.printStackTrace();
 				}
