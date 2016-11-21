@@ -1,19 +1,20 @@
 drop schema if exists public cascade;
 create schema public;
 
-create type ride_ as enum('bike', 'car', 'mobike');
+create type ride_ as enum('2 wheeler', '4 wheeler');
 create type ownedby_ as enum('company', 'user');
 create type status_ as enum('with_owner', 'lent');
 create type request_ as enum('nullable', 'repair', 'unlend', 'lend');
 
 create table ride(
 	rideid			varchar(20) primary key not null,
-	ridetype		ride_,
+	ridetype		ride_ not null,
 	makemodel		varchar(20),
 	color			varchar(20),
 	ownedby			ownedby_ not null,
 	status			status_ not null,
-	code			int
+	code			int,
+	url				varchar(6000)
 );
 
 create table rider(
