@@ -1,3 +1,4 @@
+package main;
 
 import java.sql.*;
 
@@ -10,73 +11,77 @@ import org.json.JSONObject;
 
 public class DbHandler {
 	// connection strings
-	private static String connString = "jdbc:postgresql://localhost:5860/postgres";
-	private static String userName = "shubham";
+	private static String connString = "jdbc:postgresql://localhost:5432/postgres";
+	private static String userName = "rganvir";
 	private static String passWord = "";
 
+	private static String admin = "admin";
+	private static String admin_pass = "qwertyuiop";
+	
 	// Frequently used strings
 	private static String BAD_USER = "bad user";
 	public static String USER_ATTR = "userid";
-
+	private static String IS_ADMIN = "IS_ADMIN";
+	
 	private static JSONArray ResultSetConverter(ResultSet rs) throws SQLException, JSONException {
 
 		// TODO Auto-generated method stub
 		JSONArray json = new JSONArray();
 		ResultSetMetaData rsmd = rs.getMetaData();
-	    while(rs.next()) {
-	        int numColumns = rsmd.getColumnCount();
-	        JSONObject obj = new JSONObject();
+		while(rs.next()) {
+			int numColumns = rsmd.getColumnCount();
+			JSONObject obj = new JSONObject();
 
-	        for (int i=1; i<numColumns+1; i++) {
-	          String column_name = rsmd.getColumnName(i);
+			for (int i=1; i<numColumns+1; i++) {
+			  String column_name = rsmd.getColumnName(i);
 
-	          if(rsmd.getColumnType(i)==java.sql.Types.ARRAY){
-	           obj.put(column_name, rs.getArray(column_name));
-	          }
-	          else if(rsmd.getColumnType(i)==java.sql.Types.BIGINT){
-	           obj.put(column_name, rs.getInt(column_name));
-	          }
-	          else if(rsmd.getColumnType(i)==java.sql.Types.BOOLEAN){
-	           obj.put(column_name, rs.getBoolean(column_name));
-	          }
-	          else if(rsmd.getColumnType(i)==java.sql.Types.BLOB){
-	           obj.put(column_name, rs.getBlob(column_name));
-	          }
-	          else if(rsmd.getColumnType(i)==java.sql.Types.DOUBLE){
-	           obj.put(column_name, rs.getDouble(column_name));
-	          }
-	          else if(rsmd.getColumnType(i)==java.sql.Types.FLOAT){
-	           obj.put(column_name, rs.getFloat(column_name));
-	          }
-	          else if(rsmd.getColumnType(i)==java.sql.Types.INTEGER){
-	           obj.put(column_name, rs.getInt(column_name));
-	          }
-	          else if(rsmd.getColumnType(i)==java.sql.Types.NVARCHAR){
-	           obj.put(column_name, rs.getNString(column_name));
-	          }
-	          else if(rsmd.getColumnType(i)==java.sql.Types.VARCHAR){
-	           obj.put(column_name, rs.getString(column_name));
-	          }
-	          else if(rsmd.getColumnType(i)==java.sql.Types.TINYINT){
-	           obj.put(column_name, rs.getInt(column_name));
-	          }
-	          else if(rsmd.getColumnType(i)==java.sql.Types.SMALLINT){
-	           obj.put(column_name, rs.getInt(column_name));
-	          }
-	          else if(rsmd.getColumnType(i)==java.sql.Types.DATE){
-	           obj.put(column_name, rs.getDate(column_name));
-	          }
-	          else if(rsmd.getColumnType(i)==java.sql.Types.TIMESTAMP){
-	          obj.put(column_name, rs.getTimestamp(column_name));
-	          }
-	          else{
-	           obj.put(column_name, rs.getObject(column_name));
-	          }
-	        }
+			  if(rsmd.getColumnType(i)==java.sql.Types.ARRAY){
+			   obj.put(column_name, rs.getArray(column_name));
+			  }
+			  else if(rsmd.getColumnType(i)==java.sql.Types.BIGINT){
+			   obj.put(column_name, rs.getInt(column_name));
+			  }
+			  else if(rsmd.getColumnType(i)==java.sql.Types.BOOLEAN){
+			   obj.put(column_name, rs.getBoolean(column_name));
+			  }
+			  else if(rsmd.getColumnType(i)==java.sql.Types.BLOB){
+			   obj.put(column_name, rs.getBlob(column_name));
+			  }
+			  else if(rsmd.getColumnType(i)==java.sql.Types.DOUBLE){
+			   obj.put(column_name, rs.getDouble(column_name));
+			  }
+			  else if(rsmd.getColumnType(i)==java.sql.Types.FLOAT){
+			   obj.put(column_name, rs.getFloat(column_name));
+			  }
+			  else if(rsmd.getColumnType(i)==java.sql.Types.INTEGER){
+			   obj.put(column_name, rs.getInt(column_name));
+			  }
+			  else if(rsmd.getColumnType(i)==java.sql.Types.NVARCHAR){
+			   obj.put(column_name, rs.getNString(column_name));
+			  }
+			  else if(rsmd.getColumnType(i)==java.sql.Types.VARCHAR){
+			   obj.put(column_name, rs.getString(column_name));
+			  }
+			  else if(rsmd.getColumnType(i)==java.sql.Types.TINYINT){
+			   obj.put(column_name, rs.getInt(column_name));
+			  }
+			  else if(rsmd.getColumnType(i)==java.sql.Types.SMALLINT){
+			   obj.put(column_name, rs.getInt(column_name));
+			  }
+			  else if(rsmd.getColumnType(i)==java.sql.Types.DATE){
+			   obj.put(column_name, rs.getDate(column_name));
+			  }
+			  else if(rsmd.getColumnType(i)==java.sql.Types.TIMESTAMP){
+			  obj.put(column_name, rs.getTimestamp(column_name));
+			  }
+			  else{
+			   obj.put(column_name, rs.getObject(column_name));
+			  }
+			}
 
-	        json.put(obj);
-	      }
-	    return json;
+			json.put(obj);
+		  }
+		return json;
 	}
 
 	public static JSONObject authenticate(HttpServletRequest request, String id, String password){
@@ -104,7 +109,7 @@ public class DbHandler {
 				ResultSet result =  preparedStmt.executeQuery();
 
 				if (!result.isBeforeFirst() ) {
-				    System.out.println("No user found");
+					System.out.println("No user found");
 					obj.put("status", false);
 					obj.put("message", "Authentication Failed");
 					obj.put("data", "");
@@ -494,7 +499,7 @@ public class DbHandler {
 				preparedStmt.setString(1, RideID);
 				ResultSet result =  preparedStmt.executeQuery();
 				if (!result.isBeforeFirst() ) {
-				    System.out.println("Ride Code not Found");
+					System.out.println("Ride Code not Found");
 					obj.put("status", false);
 					obj.put("message", "Ride Code not Found");
 					obj.put("data", "");
@@ -610,7 +615,7 @@ public class DbHandler {
 				PreparedStatement preparedStmt = conn.prepareStatement(query);
 				preparedStmt.setString(1, userID);
 
-//				System.out.println(preparedStmt.toString());
+				//System.out.println(preparedStmt.toString());
 
 				ResultSet result = preparedStmt.executeQuery();
 				JSONArray stnds = ResultSetConverter(result);
@@ -895,7 +900,6 @@ public class DbHandler {
 		return obj;
 	}
 
-
 	public static JSONObject Unlend(String userid, String rideid, String optype) {
 		JSONObject obj = new JSONObject();
 		System.out.println("Lend: "+userid+","+rideid+","+optype);
@@ -996,8 +1000,8 @@ public class DbHandler {
 		System.out.println(obj);
 		return obj;
 	}
-
-	public static boolean bike_present_at_stand(String bikeID, String standID){
+	
+	public static boolean bike_present_at_stand(String bikeID, String standID){	
 		System.out.println("authenticate:"+bikeID+","+standID);
 		try{
 			if(bikeID == null || standID == null) {
@@ -1012,12 +1016,12 @@ public class DbHandler {
 				preparedStmt.setString(2, standID);
 				ResultSet result =  preparedStmt.executeQuery();
 				result.next();
-				boolean ans = (result.getInt(1) > 0);
+				boolean ans = (result.getInt(1) > 0); 
 				preparedStmt.close();
 				conn.close();
 				return ans;
-			}
-		}
+			}			
+		} 
 		catch(Exception e) {
 			System.out.println(e);
 		}
@@ -1196,4 +1200,205 @@ public class DbHandler {
 		}
 		return obj;
 	}
+
+	public static boolean admin_auth(HttpServletRequest request, String id, String pass){
+		if (id != admin || pass != admin_pass){
+			return false;
+		}
+		
+		HttpSession session = request.getSession(true);
+		session.setAttribute(IS_ADMIN, true);
+		if(session.isNew()){
+			System.out.println("New Session for admin");
+		}
+		else{
+			System.out.println("Using old Session for admin");
+		}
+		return true;
+	}
+
+	public static JSONObject getRequests(HttpServletRequest request) throws JSONException{		
+		JSONObject obj = new JSONObject();
+		System.out.println("getRequests ");
+		String query = "select * from requests";
+
+		if (request.getAttribute(IS_ADMIN) == null || !(Boolean)request.getAttribute(IS_ADMIN)){
+			obj.put("status", false);				
+			obj.put("message", BAD_USER);
+			return obj;
+		}
+		try {
+			// Create the connection
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			PreparedStatement preparedStmt = conn.prepareStatement(query);
+			ResultSet result = preparedStmt.executeQuery();
+			JSONArray stnds = ResultSetConverter(result);
+			preparedStmt.close();
+			conn.close();
+
+			obj.put("status", true);
+			obj.put("data", stnds);
+		}
+		catch(Exception e) {
+			System.out.println(e);
+			try{
+				obj.put("status",false);
+				obj.put("message",e);
+			}
+			catch(JSONException e1){
+				System.out.println(e1);
+			}
+		}
+		return obj;
+	}
+
+	//handle all corner cases and other details later on
+	public static boolean handleLend(HttpServletRequest request, String rideid, String type) throws SQLException{
+		if (request.getAttribute(IS_ADMIN) == null || (!type.equals("accept") && !type.equals("cancel")) || !(Boolean)request.getAttribute(IS_ADMIN)){
+			// obj.put("status", false);				
+			// obj.put("message", BAD_USER);
+			return false;
+		}
+		
+		if(type.equals("accept")){
+			//for now insert ride always at the first stand - 's1'
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			try {
+				conn.setAutoCommit(false);
+				
+				String upd1 = "delete from requests where rideid=?";
+				String upd2 = "insert into ride_at_stand values (?, 's1')"; 
+				String upd3 = "update ride set status='lent' where rideid=?";
+				
+				PreparedStatement preparedStmt1 = conn.prepareStatement(upd1);
+				preparedStmt1.setString(1, rideid);
+				PreparedStatement preparedStmt2 = conn.prepareStatement(upd2);
+				preparedStmt2.setString(1, rideid);
+				PreparedStatement preparedStmt3 = conn.prepareStatement(upd3);
+				preparedStmt3.setString(1, rideid);
+				
+				if (preparedStmt1.executeUpdate() < 1 ){
+					preparedStmt1.close();
+					conn.close();
+					return false;
+				}
+				if(preparedStmt2.executeUpdate() == 0) {
+					conn.rollback();
+					conn.setAutoCommit(true);
+					preparedStmt1.close();
+					preparedStmt2.close();
+					conn.close();
+					return false;
+				}
+				if(preparedStmt3.executeUpdate() == 0) {
+					conn.rollback();
+					conn.setAutoCommit(true);
+					preparedStmt1.close();
+					preparedStmt2.close();
+					preparedStmt3.close();
+					conn.close();
+					return false;
+				}
+				preparedStmt1.close();
+				preparedStmt2.close();
+				preparedStmt3.close();
+				conn.commit();
+				return true;
+			}
+			catch(SQLException se) {
+				conn.rollback();
+			}
+			
+			conn.setAutoCommit(true);
+			conn.close();
+			
+		}
+		
+		if (type.equals("reject")) {
+			// Create the connection
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			String query = "delete from requests where rideid=?";
+			PreparedStatement preparedStmt = conn.prepareStatement(query);
+			preparedStmt.setString(1, rideid);
+			if (preparedStmt.executeUpdate() < 1 ){
+				preparedStmt.close();
+				conn.close();
+				return false;
+			}
+			preparedStmt.close();
+			conn.close();
+			return true;
+		}
+		
+		
+		return false;
+	}
+
+	//handle all corner cases and other details later on
+	public static boolean handleUnlend(HttpServletRequest request, String rideid, String type) throws SQLException{
+		if (request.getAttribute(IS_ADMIN) == null || (!type.equals("accept") && !type.equals("cancel")) || !(Boolean)request.getAttribute(IS_ADMIN)){
+			// obj.put("status", false);				
+			// obj.put("message", BAD_USER);
+			return false;
+		}
+		
+		if(type.equals("accept")){
+			//for now insert ride always at the first stand - 's1'
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			try {
+				conn.setAutoCommit(false);
+				
+				String upd1 = "delete from requests where rideid=?";
+				String upd2 = "delete from ride_at_stand where rideid=?"; 
+				
+				PreparedStatement preparedStmt1 = conn.prepareStatement(upd1);
+				preparedStmt1.setString(1, rideid);
+				PreparedStatement preparedStmt2 = conn.prepareStatement(upd2);
+				preparedStmt2.setString(1, rideid);
+				
+				if (preparedStmt1.executeUpdate() < 1 ){
+					preparedStmt1.close();
+					conn.close();
+					return false;
+				}
+				if(preparedStmt2.executeUpdate() == 0) {
+					conn.rollback();
+					conn.setAutoCommit(true);
+					preparedStmt1.close();
+					preparedStmt2.close();
+					conn.close();
+					return false;
+				}
+				preparedStmt1.close();
+				preparedStmt2.close();
+				conn.commit();
+				return true;
+			}
+			catch(SQLException se) {
+				conn.rollback();
+			}
+			conn.setAutoCommit(true);
+			conn.close();
+		}
+		
+		if (type.equals("reject")) {
+			// Create the connection
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			String query = "delete from requests where rideid=?";
+			PreparedStatement preparedStmt = conn.prepareStatement(query);
+			preparedStmt.setString(1, rideid);
+			if (preparedStmt.executeUpdate() < 1 ){
+				preparedStmt.close();
+				conn.close();
+				return false;
+			}
+			preparedStmt.close();
+			conn.close();
+			return true;
+		}
+		
+		
+		return false;
+	}
+
 }
