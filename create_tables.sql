@@ -75,3 +75,16 @@ create table requests(
 	foreign key (rideid) references ride on DELETE cascade,
 	foreign key (riderid) references rider on DELETE cascade
 );
+
+create table history(
+	rideid			varchar(20) primary key not null,
+	userid			varchar(20) not null,
+	fromstandid		varchar(20) not null,
+	fromtime		timestamp not null,
+	tostandid		varchar(20),
+	totime			timestamp,
+	foreign key (rideid) references ride on DELETE cascade,
+	foreign key (userid) references rider on DELETE cascade,
+	foreign key (fromstandid) references stand on DELETE cascade,
+	foreign key (tostandid) references stand on DELETE cascade
+);
