@@ -1,4 +1,3 @@
-package main;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -36,15 +35,11 @@ public class PersonalRides extends HttpServlet {
 		if (session != null){
 			userID = (String) session.getAttribute(DbHandler.USER_ATTR);
 		}
+		System.out.println("Personal Rides: "+userID);
 		response.setContentType("application/json");
 	    response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();		
-		try {
-			out.print(DbHandler.getPersonalRides(userID));
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		out.print(DbHandler.getPersonalRides(userID));
 		out.close();
 	}
 

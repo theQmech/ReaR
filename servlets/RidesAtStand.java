@@ -1,4 +1,3 @@
-package main;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -33,7 +32,7 @@ public class RidesAtStand extends HttpServlet {
 		if (session != null){
 			userID = (String) session.getAttribute(DbHandler.USER_ATTR);
 		}
-		String standID = request.getParameter("StandID");
+		String standID = request.getParameter("standid");
 		response.setContentType("application/json");
 	    response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();		

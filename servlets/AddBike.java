@@ -1,4 +1,3 @@
-package main;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,7 +12,7 @@ import javax.servlet.http.HttpSession;
 /**
  * Servlet implementation class BikeList
  */
-@WebServlet("/RidesAtStand")
+@WebServlet("/AddBike")
 public class AddBike extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -33,14 +32,13 @@ public class AddBike extends HttpServlet {
 		if (session != null){
 			userID = (String) session.getAttribute(DbHandler.USER_ATTR);
 		}
-		String name = request.getParameter("Name");
-		String type = request.getParameter("Type");
-		String model = request.getParameter("Model");
-		String color = request.getParameter("Color");
+		String type = request.getParameter("type");
+		String model = request.getParameter("model");
+		String color = request.getParameter("color");
 		response.setContentType("application/json");
 	    response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();		
-		out.print(DbHandler.AddBike(userID, name, type, model, color));
+		out.print(DbHandler.AddBike(userID, type, model, color));
 		out.close();
 	}
 

@@ -1,4 +1,3 @@
-package main;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -39,12 +38,7 @@ public class RentedRides extends HttpServlet {
 		response.setContentType("application/json");
 	    response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();		
-		try {
-			out.print(DbHandler.getRentedRides(userID));
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		out.print(DbHandler.getRentedRides(userID));
 		out.close();
 	}
 

@@ -1,4 +1,3 @@
-package main;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -37,27 +36,19 @@ public class RentUnrent extends HttpServlet {
 		if (session != null){
 			userID = (String) session.getAttribute(DbHandler.USER_ATTR);
 		}
-		String rideid = request.getParameter("RideID");
-		String standid = request.getParameter("StandID");
-		String op = request.getParameter("Op");
+		String rideid = request.getParameter("rideid");
+		String standid = request.getParameter("standid");
+		String op = request.getParameter("op");
 		
 		System.out.println("RentOp: "+userID+", "+rideid+", "+standid+", "+op);
 		
 		JSONObject obj = new JSONObject();
 		if (userID != null && rideid!=null && standid!=null && (op.equals("rent")|| op.equals("unrent"))){
 			if (op.equals("rent")){
-				try {
-					obj = DbHandler.Rent(userID, rideid, standid);
-				} catch (JSONException | SQLException e) {
-					e.printStackTrace();
-				}
+				obj = DbHandler.Rent(userID, rideid, standid);
 			}
 			else if (op.equals("unrent")){
-				try {
-					obj = DbHandler.Unrent(userID, rideid, standid);
-				} catch (JSONException | SQLException e) {
-					e.printStackTrace();
-				}
+				obj = DbHandler.Unrent(userID, rideid, standid);
 			}
 		}
 		else{

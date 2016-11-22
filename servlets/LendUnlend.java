@@ -1,4 +1,3 @@
-package main;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -37,9 +36,9 @@ public class LendUnlend extends HttpServlet {
 		if (session != null){
 			userID = (String) session.getAttribute(DbHandler.USER_ATTR);
 		}
-		String rideid = request.getParameter("RideID");
-		String op = request.getParameter("Op");
-		String optype = request.getParameter("OpType");
+		String rideid = request.getParameter("rideid");
+		String op = request.getParameter("op");
+		String optype = request.getParameter("optype");
 		
 		System.out.println("RentOp: "+userID+", "+rideid+", "+op+", "+optype);
 		
@@ -60,18 +59,10 @@ public class LendUnlend extends HttpServlet {
 		}
 		else{
 			if (op.equals("Lend")){
-				try {
-					obj = DbHandler.Lend(userID, rideid, optype);
-				} catch (JSONException | SQLException e) {
-					e.printStackTrace();
-				}
+				obj = DbHandler.Lend(userID, rideid, optype);
 			}
 			else if (op.equals("Unlend")){
-				try {
-					obj = DbHandler.Unlend(userID, rideid, optype);
-				} catch (JSONException | SQLException e) {
-					e.printStackTrace();
-				}
+				obj = DbHandler.Unlend(userID, rideid, optype);
 			}
 		}
 		response.setContentType("application/json");

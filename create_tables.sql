@@ -6,8 +6,13 @@ create type ownedby_ as enum('company', 'user');
 create type status_ as enum('with_owner', 'lent');
 create type request_ as enum('nullable', 'repair', 'unlend', 'lend');
 
+create table ride_seq(
+	id				serial primary key,
+	txt				varchar(1)
+);
+
 create table ride(
-	rideid			varchar(100) primary key not null,
+	rideid			varchar(20) primary key not null,
 	ridetype		ride_ not null,
 	makemodel		varchar(20),
 	color			varchar(20),
