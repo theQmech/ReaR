@@ -20,7 +20,7 @@ Password: qwertyuiop
 ```
 
 ## Contributors(in alphabetical order):
+* Amey Gupta ([@amey1996](https://github.com/amey1996))
 * Harshal Mahajan([@harshalm-iitb](https://github.com/harshalm-iitb))
 * Rupanshu Ganvir ([@theQmech](https://github.com/theQmech))
 * Shubham Goel ([@shubham-goel](https://github.com/shubham-goel))
-* Amey Gupta ([@amey1996](https://github.com/amey1996))
