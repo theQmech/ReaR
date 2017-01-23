@@ -1,0 +1,266 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LaTeX Example: Project Report
+%
+% Source: http://www.howtotex.com
+%
+% Feel free to distribute this example, but please keep the referral
+% to howtotex.com
+% Date: March 2011 
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% How to use writeLaTeX: 
+%
+% You edit the source code here on the left, and the preview on the
+% right shows you the result within a few seconds.
+%
+% Bookmark this page and share the URL with your co-authors. They can
+% edit at the same time!
+%
+% You can upload figures, bibliographies, custom classes and
+% styles using the files menu.
+%
+% If you're new to LaTeX, the wikibook is a great place to start:
+% http://en.wikibooks.org/wiki/LaTeX
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%% Preamble
+\documentclass[paper=a4, fontsize=11pt]{scrartcl}
+\usepackage[T1]{fontenc}
+\usepackage{fourier}
+\usepackage{listings}
+\usepackage[english]{babel}
+\usepackage[protrusion=true,expansion=true]{microtype}
+\usepackage{amsmath,amsfonts,amsthm}
+\usepackage[pdftex]{graphicx}
+\usepackage{url}
+\usepackage{enumerate}
+
+%%% Custom sectioning
+\usepackage{sectsty}
+\allsectionsfont{\centering \normalfont\scshape}
+
+
+%%% Custom headers/footers (fancyhdr package)
+\usepackage{fancyhdr}
+\pagestyle{fancyplain}
+\fancyhead{}							% No page header
+\fancyfoot[L]{}							% Empty 
+\fancyfoot[C]{}							% Empty
+\fancyfoot[R]{\thepage}					% Pagenumbering
+\renewcommand{\headrulewidth}{0pt}		% Remove header underlines
+\renewcommand{\footrulewidth}{0pt}		% Remove footer underlines
+\setlength{\headheight}{13.6pt}
+
+
+%%% Equation and float numbering
+\numberwithin{equation}{section}		% Equationnumbering: section.eq#
+\numberwithin{figure}{section}			% Figurenumbering: section.fig#
+\numberwithin{table}{section}			% Tablenumbering: section.tab#
+
+
+%%% Maketitle metadata
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} 	% Horizontal rule
+
+\title{
+	%\vspace{-1in} 	
+	\usefont{OT1}{bch}{b}{n}
+	\normalfont \normalsize \textsc{CS387 PROJECT REPORT, AUTUMN 2016} \\ [25pt]
+	\horrule{1pt} \\[0.4cm]
+	\huge Ride Rental Management System \\
+	\horrule{1pt} \\[0.5cm]
+}
+\author{
+	\normalfont \normalsize
+	\begin{tabular}{ l l }
+		\hline
+		\multicolumn{2}{c}{Team Members} \\
+		\hline
+		140050003 & Harshal Mahajan \\
+		140050005 & Rupanshu Ganvir \\
+		140050026 & Amey Gupta \\
+		140050086 & Shubham Goel \\
+		\hline
+	\end{tabular}\\
+}
+\date{}
+
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+	language=sql,
+	aboveskip=3mm,
+	belowskip=3mm,
+	showspaces=false,
+	showstringspaces=false,
+	columns=flexible,
+	basicstyle={\small\ttfamily},
+	numbers=none,
+	numberstyle=\tiny\color{gray},
+	keywordstyle=\color{blue},
+	commentstyle=\color{dkgreen},
+	stringstyle=\color{mauve},
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=4
+}
+
+%%% Begin document
+\begin{document}
+\maketitle
+\section{The Goal}
+We aim to create an Android application meant for a Vehicle Rental Company involved in renting bicycles, cars and possibly other vehicles from and to users. The application allows users to manage their related transactions easily, and quickly. This takes inspiration from Europe-based bike rental systems where users can automatically rent bikes from one of public bicycle stands, and return them to any other stand. 
+
+Rather than providing with simple renting feautres, we also provide the service of letting the user lend their vehicle to the company for some time period, so that it can be rented out to other users. The user can unlend his ride whenever it pleases him given that his/her ride is not rented at the time. So, in a way this is an attempt to create a one stop solution for all rental services of vehicles for short distance transport. 
+
+\section{Functionality and Feautures}
+All instances of this application communicate with a central database through servlets, which 
+perform the required transactions and send back notifications to the user. Along with this we have a  web based interface
+for the employee who can accept or reject requests(which we will explain soon) from the user.
+
+We assume that the company has several stands where vehicles are available for rent. The user application helps the user to search for available rides and get the code to unlock the ride form the stand. The stands have the infrastructure required for automatic locking and unlocking of the rides using lock combinations unique to each ride. The most basic functions are:
+\begin{itemize}
+	\item \textbf{Rent/Unrent} a ride form the company's stand.
+	\item \textbf{Lend/Unlend} a ride to the company which can further rent out these to oter users.
+\end{itemize}
+Apart from that the application has the following features and functionalities:
+\begin{itemize}
+\item \textbf{Homepage} has a Map API which indicates stands at different places using markers. Clicking on the marker further opens up a tooltip which shows details of the stand, like number of different kinds of vehicles available. This tooltip also shows an option to unrent previously rented rides at the particular stand.
+\item A \textbf{Stand} view which shows the details of all the rides available at a given stand. This is intented for the purpose of browsing different rides available for rent.
+\item On most of the activities, the user can see a \textbf{floating button} with a vehicle(car) symbol meant to rent a ride. Clicking on this opens up a dialogue box. The user is suposed to enter the ID of the ride in this box in order to rent the ride. The ID can be found out from the Stand Activity. 
+\item On entering the ride ID in the dialogue box mentioned above, the user sees the \textbf{details of the ride}, like type, model and color along with a \text{RENT} button. To rent the ride, user clicks on this button, is asked for a confirmation. If the renting transaction is successful, the customer is shown a \textbf{lock combination} to unlock the ride. One of the subtleties involved is that the ride ID can only be obtained physically from seeing the bike and not from the application itself.
+\item A \textbf{MyRides} view showing the user two things: all rides he owns and has registered with the app, and all rides he currently has rented with him. Among the rides registered by the user, some rides could have been lent to the company previously.
+\item All the personal rides of the user have a \textbf{Lent or Unlent} option with them depending on the status of the ride. Each operation results in a request being registered with them system. The company will then send over someone to receive or return the ride. The completion of the request can be registered using the admin interface by the employees of the company.
+\item The user can see all his previous rent transactions in a \textbf{History} page.
+\item {Profile} page on which the user sees his personal details and can change them if necessary.
+\end{itemize}
+
+\newpage
+
+\section{Setting up the System}
+The application had three parts: (i) database, (ii) servlets and (iii) the mobile application.
+\begin{enumerate}[i]
+	\item The submission has two scripts: \texttt{create\_tables.sql} and \texttt{insert\_small\_data.sql} inside \texttt{scripts/} which setup the tables and populate the schema respectively
+	\item The code for the servlets can be found in \texttt{src/servlets/}. Setting up the servlets is straight forward. The necessary \texttt{jars} can be found in \texttt{src/servlets/jars/}
+	\item Source code of the android application is present in \texttt{src/android/}. Necessary \texttt{jars} in \texttt{src/android/jars/}
+\end{enumerate}
+Please go through the \texttt{README} as well for any detailed instructions. 
+
+\section{Database Design}
+We present all our tables in \texttt{SQL} format. The table names and attribute names are all self-explanaory.
+\begin{lstlisting}
+create type ride_ as enum('2 wheeler', '4 wheeler');
+create type ownedby_ as enum('company', 'user');
+create type status_ as enum('with_owner', 'lent');
+create type request_ as enum('nullable', 'repair', 'unlend', 'lend');
+
+create table ride_seq(
+	id		serial primary key,
+	txt		varchar(1)
+);
+
+create table ride(
+	rideid		varchar(20) primary key not null,
+	ridetype	ride_ not null,
+	makemodel	varchar(20),
+	color		varchar(20),
+	ownedby		ownedby_ not null,
+	status		status_ not null,
+	code		int,
+	url			varchar(6000)
+);
+
+create table rider(
+	riderid		varchar(50) primary key not null,
+	name		varchar(40) not null,
+	password	varchar(20) not null,
+	address		varchar(60),
+	phone		varchar(20)
+);
+
+create table stand(
+	standid		varchar(20) primary key not null,
+	capacity	int			not null,
+	name		varchar(20)	not null,
+	address		varchar(60)	not null,
+	lat			float		not null,
+	long		float		not null
+);
+
+create table ownership(
+	rideid		varchar(20)	not null,
+	ownerid		varchar(20)	not null,
+	primary key (rideid, ownerid),
+	foreign key (rideid) references ride on DELETE cascade,
+	foreign key (ownerid) references rider on DELETE cascade
+);
+
+create table rentdata(
+	rideid		varchar(20) primary key not null,
+	userid		varchar(20) not null,
+	fromstandid	varchar(20) not null,
+	tostandid	varchar(20),
+	foreign key (rideid) references ride on DELETE cascade,
+	foreign key (userid) references rider on DELETE cascade,
+	foreign key (fromstandid) references stand on DELETE cascade,
+	foreign key (tostandid) references stand on DELETE cascade
+);
+
+create table ride_at_stand(
+	rideid		varchar(20)	not null,
+	standid		varchar(20)	not null,
+	primary key (rideid, standid),
+	foreign key (rideid) references ride on DELETE cascade,
+	foreign key (standid) references stand on DELETE cascade
+);
+
+create table requests(
+	rideid		varchar(20)	not null,
+	riderid		varchar(20) not null,
+	type		request_,
+	standid		varchar(20),
+	primary key (rideid, riderid),
+	foreign key (rideid) references ride on DELETE cascade,
+	foreign key (riderid) references rider on DELETE cascade
+);
+
+
+
+
+create table history(
+	rideid		varchar(20) primary key not null,
+	userid		varchar(20) not null,
+	fromstandid	varchar(20) not null,
+	fromtime	timestamp not null,
+	tostandid	varchar(20),
+	totime		timestamp,
+	foreign key (rideid) references ride on DELETE cascade,
+	foreign key (userid) references rider on DELETE cascade,
+	foreign key (fromstandid) references stand on DELETE cascade,
+	foreign key (tostandid) references stand on DELETE cascade
+);
+\end{lstlisting}
+
+\section{Future Work}
+There are a lot of features which can be in addition to the existing ones, some of them being:
+\begin{enumerate}
+	\item \textbf{Money:} Right now all the transactions are cost less. We can decide to charge the user on basis of amount of time he rents a ride and the type of ride. 
+	\item \textbf{Retail:} Provide buy/sell services to the user. He can request to sell a vehicle to the company, following which a request for the sale will be registered pending approval. Similarly, the user could buy a ride for self from a pool of rides alloted by the company for sale purposes.
+	\item \textbf{Repair:} A repair feature, which is nothing but a request to repair persoanal faulty ride. The company could send in employees to do the repair and charge the user accordingly.
+	\item \textbf{Feedback and Complaint}: Given that the rides will be used by many people, the condition of the rides is bound to be questionable after some time. Apart from regular servicing, inputs from the server will prove to be valuable to the success of the company.
+\end{enumerate}
+
+\section{Future Scope}
+
+While coming up with a project idea, the practicality and relevance in real world was our primary focus. The usefulness of the product in an institute such as IITB, actually made us enthusiastic about this project. All the development pertaining to the application were done keeping in usability of the application as a final product. 
+
+Having said that, we feel that our project could become a final product since solved some of the most crucial problems relating to design of the database and the application in general in the early phases of the project. 
+
+The targeted customers are students at IITB specifically, though some features are feasible only for a much broader and general customer base. As mentioned before, we could charge the customers for rentals and repairs and also give a part of the rent charge to the user whose lent ride was used.
+
+\end{document}

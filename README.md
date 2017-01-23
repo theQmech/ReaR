@@ -1,2 +1,14 @@
 # newForce
 Course Project CS387
+
+To access the admin interface, go to the URL host:port/newForce/AdminLogin.
+
+Admin Credentials:
+Username: admin
+Password: qwertyuiop
+
+Android: 
+Extract the zip of android and import in Android Studio.
+You may need to change  the location of Sdk which will be prompted by Android Studio.
+
+To run the app, compile and run on an Android device with Android version more than 4.4.2+ 
